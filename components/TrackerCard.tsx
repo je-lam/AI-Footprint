@@ -16,8 +16,8 @@ const TrackerCard = () => {
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-[17px] font-semibold text-gray-900 flex items-center gap-2 whitespace-nowrap">
           Water used by ChatGPT this
-          <button className="bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-[12px] text-[15px] font-semibold flex items-center gap-1 transition-colors">
-            Month <ChevronDown className="w-4 h-4 text-gray-600" strokeWidth={3} />
+          <button className="bg-gray-200 hover:bg-gray-200 px-3 py-1.5 rounded-[12px] text-[15px] font-semibold flex items-center gap-1 transition-colors">
+            Month <ChevronDown className="w-4 h-4 text-gray-600" strokeWidth={3} color="#1a1a1a"/>
           </button>
         </h2>
         <button className="text-gray-400 hover:text-gray-600 transition-colors">
