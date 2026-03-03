@@ -47,23 +47,23 @@ const TrackerCard = () => {
       <div className="flex justify-between px-2">
         <CircularProgress
           emoji="🥤"
-          label="Starbucks Ventis"
+          label="Standard U.S. soda cans"
           totalLiters={campusTotalLiters}
-          waterPerItemL={0.709}
+          waterPerItemL={0.355}
           ringColorClass="text-[#ff5c77]"
         />
         <CircularProgress
-          emoji="🏀"
-          label="Basketballs"
+          emoji="🛁"
+          label="Bathtubs"
           totalLiters={campusTotalLiters}
-          waterPerItemL={7.1}
+          waterPerItemL={189.3}
           ringColorClass="text-[#5c85ff]"
         />
         <CircularProgress
-          emoji="🛢️"
-          label="55-Gal Barrel"
+          emoji="🏊"
+          label="Olympic swimming pools"
           totalLiters={campusTotalLiters}
-          waterPerItemL={3781}
+          waterPerItemL={2500000}
           ringColorClass="text-[#4ade80]"
         />
       </div>
