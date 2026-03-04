@@ -10,7 +10,7 @@ const TrackerCard = () => {
   const campusTotalLiters = (currentUsageML * SCU_POPULATION) / 1000;
 
   return (
-    <div className="bg-white p-6 w-full h-full">
+    <div className="bg-white p-6 w-full min-h-screen">
 
       {/* header */}
       <div className="flex items-center justify-between mb-2">
