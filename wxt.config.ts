@@ -3,10 +3,7 @@ import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
   manifest: {
-    permissions: ['sidePanel'],
-    side_panel: {
-      default_path: 'sidepanel.html'
-    }
+    permissions: ['sidePanel', 'storage'],
   },
   modules: ["@wxt-dev/module-react"],
   runner: {

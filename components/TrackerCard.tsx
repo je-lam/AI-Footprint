@@ -1,9 +1,24 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Settings, ChevronDown } from "lucide-react";
 import CircularProgress from "./CircularProgress";
 
 const TrackerCard = () => {
-  const [waterUsage, setWaterUsage] = useState<number | string>(2387);
+  const [waterUsage, setWaterUsage] = useState<number | string>(0);
+
+  useEffect(() => {
+    browser.storage.sync.get("savedWaterUsage").then((result) => {
+      if (result.savedWaterUsage != undefined)
+        setWaterUsage(result.savedWaterUsage as number)
+      else
+        setWaterUsage(2387)
+    });
+  }, []);
+
+  const handleWaterUsageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setWaterUsage(newValue);
+    browser.storage.sync.set({ savedWaterUsage: newValue });
+  };
   
   const SCU_POPULATION = 10903;
   const currentUsageML = typeof waterUsage === 'string' ? parseFloat(waterUsage) || 0 : waterUsage;
@@ -30,7 +45,7 @@ const TrackerCard = () => {
         <input
           type="number"
           value={waterUsage}
-          onChange={(e) => setWaterUsage(e.target.value)}
+          onChange={handleWaterUsageChange}
           className="text-[64px] font-bold leading-none tracking-tight text-gray-900 bg-transparent outline-none w-[180px] border-b-2 border-dashed border-gray-200 hover:border-gray-400 focus:border-blue-500 transition-colors"
         />
         <span className="text-[40px] font-medium text-gray-900">
