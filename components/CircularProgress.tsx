@@ -24,8 +24,9 @@ const CircularProgress = ({
     const strokeDasharray = `${(displayPercentage * circumference) / 100} ${circumference}`;
 
     return (
-        <div className="flex flex-col items-center">
-            <div className="relative w-[76px] h-[76px] mb-3">
+        <div className="flex flex-row items-center gap-4 w-full">
+            
+            <div className="relative w-[76px] h-[76px] shrink-0">
                 <svg className="w-full h-full" viewBox="0 0 36 36">
                     <path
                         className="text-gray-200"
@@ -48,10 +49,16 @@ const CircularProgress = ({
                     {emoji}
                 </div>
             </div>
-            <div className="text-[15px] font-semibold text-gray-900 leading-tight">
-                {completedItems.toLocaleString()}
+
+            <div className="flex flex-col text-left flex-1 min-w-0">
+                <div className="text-[18px] font-bold text-gray-900 leading-tight">
+                    {completedItems.toLocaleString()}
+                </div>
+                <div className="text-[14px] text-gray-800 font-medium leading-snug break-words">
+                    {label}
+                </div>
             </div>
-            <div className="text-[13px] text-gray-800 font-medium">{label}</div>
+
         </div>
     );
 };
