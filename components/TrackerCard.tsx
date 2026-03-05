@@ -3,29 +3,24 @@ import CircularProgress from "./CircularProgress";
 import { browser } from "wxt/browser"; // Make sure to import this!
 
 const TrackerCard = () => {
-  const [waterUsage, setWaterUsage] = useState<number>(0);
+  const [waterUsage, setWaterUsage] = useState<number | string>(0);
 
   useEffect(() => {
-    // 1. Fetch the initial value when the panel opens
     browser.storage.sync.get("savedWaterUsage").then((result) => {
       if (result.savedWaterUsage !== undefined) {
-        setWaterUsage(result.savedWaterUsage as number);
+        setWaterUsage(Number(parseFloat(result.savedWaterUsage as string).toFixed(2)));
       } else {
-        setWaterUsage(2387); // Your default
+        setWaterUsage(2387);
       }
     });
 
-    // 2. LISTEN for updates from the ChatGPT content script!
     const handleStorageChange = (changes: any, areaName: string) => {
-      // If the change happened in 'sync' storage and updated our specific key
       if (areaName === "sync" && changes.savedWaterUsage) {
-        setWaterUsage(changes.savedWaterUsage.newValue);
+        setWaterUsage(Number(parseFloat(changes.savedWaterUsage.newValue).toFixed(2)));
       }
     };
-
     browser.storage.onChanged.addListener(handleStorageChange);
 
-    // 3. Cleanup the listener if the component closes
     return () => {
       browser.storage.onChanged.removeListener(handleStorageChange);
     };
@@ -33,8 +28,12 @@ const TrackerCard = () => {
 
   const handleWaterUsageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
-    setWaterUsage(parseFloat(newValue));
-    browser.storage.sync.set({ savedWaterUsage: Number(newValue) });
+    setWaterUsage(newValue);
+
+    const parsed = parseFloat(newValue);
+    if (!isNaN(parsed)) { 
+      browser.storage.sync.set({ savedWaterUsage: parsed });
+    }
   };
 
   const SCU_POPULATION = 10903;
