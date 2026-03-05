@@ -7,9 +7,9 @@ const TrackerCard = () => {
   useEffect(() => {
     browser.storage.sync.get("savedWaterUsage").then((result) => {
       if (result.savedWaterUsage != undefined)
-        setWaterUsage(result.savedWaterUsage as number)
+        setWaterUsage(result.savedWaterUsage as number);
       else
-        setWaterUsage(2387)
+        setWaterUsage(2387);
     });
   }, []);
 
@@ -24,11 +24,11 @@ const TrackerCard = () => {
   const campusTotalLiters = (currentUsageML * SCU_POPULATION) / 1000;
 
   return (
-    <div className="bg-white p-6 w-full min-h-screen">
+    <div className="bg-white p-4 w-full h-full overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
 
       {/* header */}
-      <div className="flex items-center justify-between mb-2">
-        <h2 className="text-[30px] font-semibold text-gray-900 flex items-center gap-2 whitespace-nowrap">
+      <div className="mb-4">
+        <h2 className="text-2xl font-semibold text-gray-900 leading-tight">
           Water used by ChatGPT
         </h2>
       </div>
@@ -39,23 +39,22 @@ const TrackerCard = () => {
           type="number"
           value={waterUsage}
           onChange={handleWaterUsageChange}
-          className="text-[64px] font-bold leading-none tracking-tight text-gray-900 bg-transparent outline-none w-[180px] border-b-2 border-dashed border-gray-200 hover:border-gray-400 focus:border-blue-500 transition-colors"
+          className="text-5xl font-bold leading-none tracking-tight text-gray-900 bg-transparent outline-none w-48 border-b-2 border-dashed border-gray-200 hover:border-gray-400 focus:border-blue-500 transition-colors"
         />
-        <span className="text-[40px] font-medium text-gray-900">
+        <span className="text-3xl font-medium text-gray-900">
           mL
         </span>
       </div>
 
-      <p className="text-[15px] text-gray-800 mb-6 font-medium">
+      <p className="text-[13px] text-gray-800 mb-6 font-medium break-words leading-relaxed">
         If everyone at SCU had the same AI usage as you, that's:
       </p>
 
       {/* progress bars */}
-      {/* can easily swap items by changing emoji, label, waterPerItemL */}
-      <div className="flex justify-between px-2">
+      <div className="flex flex-col gap-6">
         <CircularProgress
           emoji="🥤"
-          label="Standard U.S. soda cans"
+          label="Standard U.S. Soda Cans"
           totalLiters={campusTotalLiters}
           waterPerItemL={0.355}
           ringColorClass="text-[#ff5c77]"
@@ -69,7 +68,7 @@ const TrackerCard = () => {
         />
         <CircularProgress
           emoji="🏊"
-          label="Olympic swimming pools"
+          label="Olympic Swimming Pools"
           totalLiters={campusTotalLiters}
           waterPerItemL={2500000}
           ringColorClass="text-[#4ade80]"

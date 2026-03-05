@@ -3,7 +3,7 @@ import TrackerCard from "@/components/TrackerCard";
 
 function App() {
   return (
-    <div className="w-[450px] font-sans bg-white m-0 p-0">
+    <div className="w-full h-full font-sans bg-white">
       <TrackerCard />
     </div>
   );
