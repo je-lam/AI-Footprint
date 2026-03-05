@@ -1,23 +1,61 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Settings, ChevronDown } from "lucide-react";
 import CircularProgress from "./CircularProgress";
+import { browser } from "wxt/browser"; // Make sure to import this!
 
 const TrackerCard = () => {
-  const [waterUsage, setWaterUsage] = useState<number | string>(2387);
-  
+  const [waterUsage, setWaterUsage] = useState<number>(0);
+
+  useEffect(() => {
+    // 1. Fetch the initial value when the panel opens
+    browser.storage.sync.get("savedWaterUsage").then((result) => {
+      if (result.savedWaterUsage !== undefined) {
+        setWaterUsage(result.savedWaterUsage as number);
+      } else {
+        setWaterUsage(2387); // Your default
+      }
+    });
+
+    // 2. LISTEN for updates from the ChatGPT content script!
+    const handleStorageChange = (changes: any, areaName: string) => {
+      // If the change happened in 'sync' storage and updated our specific key
+      if (areaName === "sync" && changes.savedWaterUsage) {
+        setWaterUsage(changes.savedWaterUsage.newValue);
+      }
+    };
+
+    browser.storage.onChanged.addListener(handleStorageChange);
+
+    // 3. Cleanup the listener if the component closes
+    return () => {
+      browser.storage.onChanged.removeListener(handleStorageChange);
+    };
+  }, []);
+
+  const handleWaterUsageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setWaterUsage(parseFloat(newValue));
+    browser.storage.sync.set({ savedWaterUsage: Number(newValue) });
+  };
+
   const SCU_POPULATION = 10903;
-  const currentUsageML = typeof waterUsage === 'string' ? parseFloat(waterUsage) || 0 : waterUsage;
+  const currentUsageML =
+    typeof waterUsage === "string" ? parseFloat(waterUsage) || 0 : waterUsage;
   const campusTotalLiters = (currentUsageML * SCU_POPULATION) / 1000;
 
   return (
-    <div className="bg-white p-6 w-full h-full">
-
+    <div className="bg-white p-6 w-full min-h-screen">
       {/* header */}
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-[17px] font-semibold text-gray-900 flex items-center gap-2 whitespace-nowrap">
           Water used by ChatGPT this
           <button className="bg-gray-200 hover:bg-gray-200 px-3 py-1.5 rounded-[12px] text-[15px] font-semibold flex items-center gap-1 transition-colors">
-            Month <ChevronDown className="w-4 h-4 text-gray-600" strokeWidth={3} color="#1a1a1a"/>
+            Month{" "}
+            <ChevronDown
+              className="w-4 h-4 text-gray-600"
+              strokeWidth={3}
+              color="#1a1a1a"
+            />
           </button>
         </h2>
         <button className="text-gray-400 hover:text-gray-600 transition-colors">
@@ -29,13 +67,11 @@ const TrackerCard = () => {
       <div className="mb-4 flex items-baseline gap-2">
         <input
           type="number"
-          value={waterUsage}
-          onChange={(e) => setWaterUsage(e.target.value)}
+          value={Math.round(waterUsage)}
+          onChange={handleWaterUsageChange}
           className="text-[64px] font-bold leading-none tracking-tight text-gray-900 bg-transparent outline-none w-[180px] border-b-2 border-dashed border-gray-200 hover:border-gray-400 focus:border-blue-500 transition-colors"
         />
-        <span className="text-[40px] font-medium text-gray-900">
-          mL
-        </span>
+        <span className="text-[40px] font-medium text-gray-900">mL</span>
       </div>
 
       <p className="text-[15px] text-gray-800 mb-6 font-medium">
@@ -43,7 +79,6 @@ const TrackerCard = () => {
       </p>
 
       {/* progress bars */}
-      {/* can easily swap items by changing emoji, label, waterPerItemL */}
       <div className="flex justify-between px-2">
         <CircularProgress
           emoji="🥤"
@@ -67,7 +102,6 @@ const TrackerCard = () => {
           ringColorClass="text-[#4ade80]"
         />
       </div>
-
     </div>
   );
 };
