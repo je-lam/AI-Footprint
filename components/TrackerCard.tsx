@@ -65,7 +65,7 @@ const TrackerCard = () => {
           type="number"
           value={waterUsage.toFixed(3)}
           onChange={handleWaterUsageChange}
-          className="text-[64px] font-bold leading-none tracking-tight text-gray-900 bg-transparent outline-none w-[180px] border-b-2 border-dashed border-gray-200 hover:border-gray-400 focus:border-blue-500 transition-colors"
+          className="text-[64px] font-bold leading-none tracking-tight text-gray-900 bg-transparent outline-none w-45 border-b-2 border-dashed border-gray-200 hover:border-gray-400 focus:border-blue-500 transition-colors"
         />
         <span className="text-[40px] font-medium text-gray-900">mL</span>
       </div>
@@ -100,16 +100,44 @@ const TrackerCard = () => {
       </div>
 
       {/* current prompt estimate */}
-      <div className="flex flex-col">
-        <div className="flex flex-row items-center">
-          <h1 className="text-gray-800">!</h1>
-          <h2 className="text-red-600">CURRENT PROMPT ESTIMATE</h2>
+      {liveUsage > 0.5 && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="bg-red-50 border-l-4 border-red-600 p-3 rounded-md shadow-sm"
+        >
+          <div className="flex items-start gap-3">
+            <h1 className="font-bold text-black">!</h1>
+            {/*<svg
+              className="h-5 w-5 text-red-600 flex-shrink-0"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                fillRule="evenodd"
+                d="M8.257 3.099c.765-1.36 2.68-1.36 3.445 0l6.518 11.59c.75 1.334-.213 2.98-1.722 2.98H3.461c-1.51 0-2.472-1.646-1.722-2.98L8.257 3.1zM9 7a1 1 0 10-2 0v4a1 1 0 102 0V7zm0 8a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"
+                clipRule="evenodd"
+              />
+            </svg>*/}
+            <div>
+              <h3 className="text-sm font-semibold text-red-700 uppercase tracking-wide">
+                Current prompt estimate
+              </h3>
+              <p className="mt-1 text-sm text-red-600">
+                Estimated:{" "}
+                <span className="font-mono font-semibold">
+                  {liveUsage.toFixed(2)} mL
+                </span>
+              </p>
+              <p className="mt-1 text-xs text-gray-500">
+                Consider shortening your prompt or removing attachments to lower
+                usage.
+              </p>
+            </div>
+          </div>
         </div>
-        <p className="text-gray-800">
-          You are about to use {liveUsage.toFixed(2)} mL worth of energy from AI
-          datacenters.
-        </p>
-      </div>
+      )}
     </div>
   );
 };
