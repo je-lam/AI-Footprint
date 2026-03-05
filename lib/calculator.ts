@@ -17,8 +17,21 @@ function getWaterFromEnergy(energyWh: number): number {
 
 // Takes in the length of the prompt string
 export function calculatePromptImpact(textLength: number): Impact {
+  // If there's no text, return zero impact instead of the baseline energy cost.
+  if (!textLength || textLength <= 0) {
+    return {
+      tokens: 0,
+      energy_Wh: 0,
+      water_mL: 0,
+    };
+  }
+
   const tokens = Math.ceil(textLength / 4);
-  const energy = 0.24 + (tokens / 1000) * 0.1;
+  
+  // ADJUSTED MATH: 
+  // Lowered the "connection" base cost to 0.05 Wh
+  // This makes the numbers actually climb as the user types a sentence.
+  const energy = 0.05 + (tokens / 100) * 0.1;
 
   return {
     tokens,
