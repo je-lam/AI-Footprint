@@ -1,6 +1,6 @@
-import "./popup/style.css";
+import "./sidepanel/style.css";
 import { createRoot } from "react-dom/client";
-import App from "./popup/App";
+import App from "./sidepanel/App";
 
 export default defineContentScript({
   matches: ["https://chatgpt.com/*"],
