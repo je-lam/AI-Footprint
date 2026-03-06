@@ -8,7 +8,9 @@ type Impact = {
 const WATER_INTENSITY_L_PER_KWH = 2.85;
 const WATER_FACTOR = WATER_INTENSITY_L_PER_KWH; // Translates directly to mL per Wh
 
-// Calculates water used for cooling based on energy utilized
+// Calculates water based on energy
+// This includes direct water usage (used to cool AI data centers)
+// AND indirect water usage (used for electricity generation)
 function getWaterFromEnergy(energyWh: number): number {
   return parseFloat((energyWh * WATER_FACTOR).toFixed(2));
 }
@@ -16,7 +18,6 @@ function getWaterFromEnergy(energyWh: number): number {
 // Takes in the length of the prompt string
 export function calculatePromptImpact(textLength: number): Impact {
   // If there's no text, return zero impact instead of the baseline energy cost.
-  // This avoids showing ~0.68 mL for empty prompts.
   if (!textLength || textLength <= 0) {
     return {
       tokens: 0,
@@ -26,7 +27,11 @@ export function calculatePromptImpact(textLength: number): Impact {
   }
 
   const tokens = Math.ceil(textLength / 4);
-  const energy = 0.24 + (tokens / 1000) * 0.1;
+  
+  // ADJUSTED MATH: 
+  // Lowered the "connection" base cost to 0.05 Wh
+  // This makes the numbers actually climb as the user types a sentence.
+  const energy = 0.05 + (tokens / 100) * 0.1;
 
   return {
     tokens,
@@ -38,16 +43,6 @@ export function calculatePromptImpact(textLength: number): Impact {
 // Reports water/energy impact based on file size and type
 export function calculateFileImpact(file: File): Impact {
   const sizeMB = file.size / (1024 * 1024);
-
-  // If the file is empty, return zero impact.
-  if (!file || sizeMB <= 0) {
-    return {
-      tokens: 0,
-      energy_Wh: 0,
-      water_mL: 0,
-    };
-  }
-
   let estimatedTokens = 0;
   let energyWh = 0;
 
