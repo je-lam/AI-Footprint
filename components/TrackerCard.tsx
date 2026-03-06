@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
+import { Settings, ChevronDown } from "lucide-react";
 import CircularProgress from "./CircularProgress";
 import { browser } from "wxt/browser"; // Make sure to import this!
 
 const TrackerCard = () => {
-  const [waterUsage, setWaterUsage] = useState<number | string>(0);
+  const [waterUsage, setWaterUsage] = useState(0);
+  const [liveUsage, setLiveDraftUsage] = useState(0);
 
   useEffect(() => {
     browser.storage.sync.get("savedWaterUsage").then((result) => {
@@ -55,7 +57,7 @@ const TrackerCard = () => {
       <div className="mb-4 flex items-baseline gap-2">
         <input
           type="number"
-          value={waterUsage}
+          value={waterUsage.toFixed(3)}
           onChange={handleWaterUsageChange}
           className="text-5xl font-bold leading-none tracking-tight text-gray-900 bg-transparent outline-none w-48 border-b-2 border-dashed border-gray-200 hover:border-gray-400 focus:border-blue-500 transition-colors"
         />
