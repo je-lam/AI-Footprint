@@ -13,31 +13,34 @@ export default defineContentScript({
     >();
 
     // NEW: Helper to grab the absolute latest text directly from the DOM
-    const getLatestPromptText = (): string => {
-      const editor = document.querySelector('#prompt-textarea') || document.querySelector('div[contenteditable="true"]');
-      return editor ? (editor as HTMLElement).innerText : "";
+    const getLatestPromptTextLength = (): number => {
+      const editor =
+        document.querySelector("#prompt-textarea") ||
+        document.querySelector('div[contenteditable="true"]');
+      return (editor ? (editor as HTMLElement).innerText : "").length;
     };
 
     // --- 2. LIVE ESTIMATION ENGINE ---
     const updateLiveEstimate = async () => {
       // Fetch fresh text straight from the source
-      const currentText = getLatestPromptText();
+      const currentText = getLatestPromptTextLength();
       const promptArea = document.querySelector("form") || document.body;
       const promptContext = promptArea.innerText || "";
 
-      // Step A: Check for deleted files.
-      for (const [fileName, impact] of pendingFiles.entries()) {
-        if (
-          !promptContext.includes(fileName) &&
-          !fileName.startsWith("image")
-        ) {
-          pendingFiles.delete(fileName);
-          console.log(`🗑️ [FILE DELETED] Removed ${fileName} from draft.`);
-        }
-      }
+      // VERY faulty assumptions made here
+      // // Step A: Check for deleted files.
+      // for (const [fileName, impact] of pendingFiles.entries()) {
+      //   if (
+      //     !promptContext.includes(fileName) &&
+      //     !fileName.startsWith("image")
+      //   ) {
+      //     pendingFiles.delete(fileName);
+      //     console.log(`🗑️ [FILE DELETED] Removed ${fileName} from draft.`);
+      //   }
+      // }
 
       // Step B: Calculate Text Impact using the fresh text
-      const textImpact = calculatePromptImpact(currentText.length);
+      const textImpact = calculatePromptImpact(currentText);
 
       // Step C: Sum everything up
       let totalWater = textImpact.water_mL;
@@ -49,7 +52,7 @@ export default defineContentScript({
       });
 
       console.log(
-        `📊 [LIVE DRAFT] Text: ${currentText.length} | Files: ${pendingFiles.size} | Est. Water: ${totalWater.toFixed(3)} mL`,
+        `📊 [LIVE DRAFT] Text: ${currentText} | Files: ${pendingFiles.size} | Est. Water: ${totalWater.toFixed(3)} mL`,
       );
 
       // Step D: Share this live value with the Sidepanel!
@@ -66,7 +69,7 @@ export default defineContentScript({
         if (target.type === "file" && target.files) {
           Array.from(target.files).forEach((file) => {
             const impact = calculateFileImpact(file);
-            pendingFiles.set(file.name, impact); 
+            pendingFiles.set(file.name, impact);
             console.log(`📎 [FILE ADDED] Name: ${file.name}`);
           });
           // FIX: Wait 500ms for ChatGPT's UI to render the file pill.
@@ -82,7 +85,11 @@ export default defineContentScript({
       "drop",
       (e) => {
         // Only trigger if files were actually dropped into the window
-        if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        if (
+          e.dataTransfer &&
+          e.dataTransfer.files &&
+          e.dataTransfer.files.length > 0
+        ) {
           Array.from(e.dataTransfer.files).forEach((file) => {
             const impact = calculateFileImpact(file);
             pendingFiles.set(file.name, impact);
@@ -96,8 +103,16 @@ export default defineContentScript({
     );
 
     // --- 4. DETECT TYPING AND PASTING ---
-    document.addEventListener("input", () => setTimeout(updateLiveEstimate, 50), true);
-    document.addEventListener("paste", () => setTimeout(updateLiveEstimate, 50), true);
+    document.addEventListener(
+      "input",
+      () => setTimeout(updateLiveEstimate, 50),
+      true,
+    );
+    document.addEventListener(
+      "paste",
+      () => setTimeout(updateLiveEstimate, 50),
+      true,
+    );
 
     // --- 5. DETECT FILE REMOVAL CLICKS ---
     document.addEventListener(
@@ -107,7 +122,7 @@ export default defineContentScript({
         // If they click anywhere near the prompt box (like an X on a file), recalculate
         if (target.closest("fieldset") || target.closest("form")) {
           // Wait slightly longer (200ms) for the file pill to completely vanish from the DOM
-          setTimeout(updateLiveEstimate, 200); 
+          setTimeout(updateLiveEstimate, 200);
         }
       },
       true,
@@ -116,21 +131,21 @@ export default defineContentScript({
     // --- 6. COMMIT TO STORAGE ON SEND ---
     const commitPrompt = async () => {
       // 1. Grab the text right before ChatGPT clears it!
-      const finalPromptText = getLatestPromptText();
-      
+      const finalPromptText = getLatestPromptTextLength();
+
       // Prevent blank submissions from adding footprint
-      if (finalPromptText.length === 0 && pendingFiles.size === 0) return;
+      if (finalPromptText === 0 && pendingFiles.size === 0) return;
 
-      console.log(`🚀 [PROMPT SENT] Length: ${finalPromptText.length}. Committing...`);
+      console.log(`🚀 [PROMPT SENT] Length: ${finalPromptText}. Committing...`);
 
-      const textImpact = calculatePromptImpact(finalPromptText.length);
+      const textImpact = calculatePromptImpact(finalPromptText);
       let promptWater = textImpact.water_mL;
       pendingFiles.forEach((impact) => {
         promptWater += impact.water_mL;
       });
 
       const data = await browser.storage.sync.get("savedWaterUsage");
-      const currentTotal: number = (data.savedWaterUsage as number) || 0; 
+      const currentTotal: number = Number(data.savedWaterUsage) || 0;
       const newTotal = currentTotal + promptWater;
 
       await browser.storage.sync.set({ savedWaterUsage: newTotal });
