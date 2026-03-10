@@ -10,7 +10,7 @@ const TrackerCard = () => {
   useEffect(() => {
     browser.storage.sync.get("savedWaterUsage").then((result) => {
       if (result.savedWaterUsage !== undefined) {
-        setWaterUsage(Number(result.savedWaterUsage));
+        setWaterUsage(Number(parseFloat(result.savedWaterUsage as string).toFixed(2)));
       } else {
         setWaterUsage(2387);
       }
@@ -30,7 +30,7 @@ const TrackerCard = () => {
 
     const handleStorageChange = (changes: any, areaName: string) => {
       if (areaName === "sync" && changes.savedWaterUsage) {
-        setWaterUsage(Number(changes.savedWaterUsage.newValue));
+        setWaterUsage(Number(parseFloat(changes.savedWaterUsage.newValue).toFixed(2)));
       } else if (areaName === "local" && changes.live_draft_impact) {
         setLiveDraftUsage(Number(changes.live_draft_impact.newValue.water_mL));
       }
@@ -70,7 +70,7 @@ const TrackerCard = () => {
       <div className="mb-4 flex items-baseline gap-2 shrink-0">
         <input
           type="number"
-          value={waterUsage.toFixed(3)}
+          value={waterUsage.toFixed(2)}
           onChange={handleWaterUsageChange}
           className="text-5xl font-bold leading-none tracking-tight text-gray-900 bg-transparent outline-none w-48 border-b-2 border-dashed border-gray-200 hover:border-gray-400 focus:border-blue-500 transition-colors"
         />

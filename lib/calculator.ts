@@ -28,9 +28,6 @@ export function calculatePromptImpact(textLength: number): Impact {
 
   const tokens = Math.ceil(textLength / 4);
   
-  // ADJUSTED MATH: 
-  // Lowered the "connection" base cost to 0.05 Wh
-  // This makes the numbers actually climb as the user types a sentence.
   const energy = 0.05 + (tokens / 100) * 0.1;
 
   return {
